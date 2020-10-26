@@ -4,12 +4,17 @@
  *
  * Intersect Filters
  *  bool contain_test(sgnode* a, sgnode* b, fp* p)
- *    Returns true if a contains b (bbox)
+ *    Returns true if a contains b
+ *    contain_type << bbox point >>
+ *      what kind of containment to test for, defaults to bbox
+ *      contain_type=bbox - true if bbox(a) contains bbox(b)
+ *      contain_type=point - true if hull(a) contains center(b)
  *
  *  Filter contain : node_test_filter
  *    Parameters:
  *      sgnode a
  *      sgnode b
+ *      str contain_type
  *    Returns
  *      bool - true if a contains b
  *
@@ -17,6 +22,7 @@
  *    Parameters:
  *      sgnode a
  *      sgnode b
+ *      str contain_type
  *    Returns:
  *      sgnode b - if a contains b
  *
@@ -36,7 +42,17 @@ bool contain_test(sgnode* a, sgnode* b, const filter_params* p)
     {
         return true;
     }
-    return bbox_contains(a, b);
+    string con_type = "bbox";
+    get_filter_param(0, p, "contain_type", con_type);
+    if (con_type == "bbox")
+    {
+        return bbox_contains_bbox(a, b);
+    }
+    else
+    {
+        vec3 b_center = b->get_centroid();
+        return node_contains_point(a, b_center);
+    }
 }
 
 ////// filter contain //////
@@ -52,6 +68,7 @@ filter_table_entry* contain_filter_entry()
     e->description = "Returns true if bbox(a) contains bbox(b)";
     e->parameters["a"] = "Sgnode a";
     e->parameters["b"] = "Sgnode b";
+    e->parameters["contain_type"] = "Either bbox or point";
     e->create = &make_contain_filter;
     return e;
 }
@@ -69,6 +86,7 @@ filter_table_entry* contain_select_filter_entry()
     e->description = "Output b if bbox(a) contains bbox(b)";
     e->parameters["a"] = "Sgnode a";
     e->parameters["b"] = "Sgnode b";
+    e->parameters["contain_type"] = "Either bbox or point";
     e->create = &make_contain_select_filter;
     return e;
 }

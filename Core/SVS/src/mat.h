@@ -347,6 +347,19 @@ class bbox
             }
             return true;
         }
+
+        bool contains(const vec3& p) const
+        {
+            int d;
+            for (d = 0; d < 3; ++d)
+            {
+                if (max_pt[d] < p[d] || min_pt[d] > p[d])
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
         
         void get_vals(vec3& min_out, vec3& max_out) const
         {

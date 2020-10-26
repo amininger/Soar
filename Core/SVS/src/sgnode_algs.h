@@ -24,7 +24,11 @@ bool convex_intersects(const sgnode* a, const sgnode* b);
 
 bool bbox_intersects(const sgnode* a, const sgnode* b);
 
-bool bbox_contains(const sgnode* a, const sgnode* b);
+bool bbox_contains_bbox(const sgnode* a, const sgnode* b);
+
+bool bbox_contains_point(const sgnode* a, const vec3& p);
+
+bool node_contains_point(const sgnode* a, const vec3& p);
 
 double convex_overlap(const sgnode* a, const sgnode* b, int nsamples);
 

@@ -264,11 +264,40 @@ bool bbox_intersects(const sgnode* a, const sgnode* b)
 
 // Returns true if the bounding box of node a 
 //   contains the bounding box of node b
-bool bbox_contains(const sgnode* a, const sgnode* b)
+bool bbox_contains_bbox(const sgnode* a, const sgnode* b)
 {
     bbox boxa = a->get_bounds();
     bbox boxb = b->get_bounds();
     return boxa.contains(boxb);
+}
+
+// Returns true if the bounding box of node a 
+//   contains the given point
+bool bbox_contains_point(const sgnode* a, const vec3& p)
+{
+    bbox boxa = a->get_bounds();
+    return boxa.contains(p);
+}
+
+// Returns true if node a contains the given point p
+// (point p lies inside one of the geometry nodes of a)
+bool node_contains_point(const sgnode* a, const vec3& p)
+{
+	vector<const geometry_node*> geoms;
+	a->walk_geoms(geoms);
+	if(geoms.empty()){
+		// Node a is a point, a point cannot contain another point
+		return false;
+	}
+
+	for(int i = 0, iend = geoms.size(); i < iend; i++){
+		double dist = point_geom_convex_dist(p, geoms[i]);
+		if(dist <= 0){
+			// The given point is inside node a
+			return true;
+		}
+	}
+	return false;
 }
 
 /*  
